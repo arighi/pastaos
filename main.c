@@ -5,8 +5,10 @@ int main(void)
 {
 	int i;
 
-	while (1)
-		for (i = 0; i < __COLOR_END__; i++)
-			console_clear(WHITE, i);
+	console_clear();
+	for (i = 0; i < CONSOLE_WIDTH * CONSOLE_HEIGHT; i++)
+		console_putchar('A');
+	for (i = 0; i < CONSOLE_WIDTH; i++)
+		console_putchar('B');
 	return 0;
 }
