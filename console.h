@@ -1,7 +1,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "kernel.h"
+#include <kernel.h>
 
 #define CONSOLE_ADDRESS 0xb8000
 #define CONSOLE_WIDTH	80

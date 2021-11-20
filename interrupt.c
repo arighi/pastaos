@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include <kernel.h>
 
 typedef struct irq_context {
 	/* General purpose register */

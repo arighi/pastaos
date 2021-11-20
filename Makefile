@@ -1,7 +1,7 @@
 TARGET=pastaos
 OBJS=boot.o exc.o exception.o irq.o interrupt.o console.o main.o
 
-CFLAGS=-m32 -O2 -Wall -Wextra -fno-builtin
+CFLAGS=-m32 -O2 -Wall -Wextra -fno-builtin -I.
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c -o $@ $<

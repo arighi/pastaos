@@ -1,4 +1,4 @@
-#include "console.h"
+#include <console.h>
 
 #define LAST_LINE (CONSOLE_WIDTH * (CONSOLE_HEIGHT - 1))
 

@@ -1,5 +1,5 @@
-#include "kernel.h"
-#include "console.h"
+#include <kernel.h>
+#include <console.h>
 
 int main(void)
 {
