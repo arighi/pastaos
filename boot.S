@@ -116,7 +116,13 @@ Map_K_PTE:
 	mov	$K_STACK_START, %esp
 
 	# Jump to the kernel main routine
-	jmp	main
+	call main
+
+	# Disable interrupts
+	cli
+_done:
+	hlt
+	jmp _done
 
 .align 4
 gdtr:
