@@ -1,34 +1,48 @@
-/* Kernel entry point */
-ENTRY(_start)
+K_VIR_START = 0xC0000000;
+K_PHYS_START = 0x100000;
+PAGE_SIZE = 0x1000;
+K_STACK_SIZE = PAGE_SIZE;
+
+ENTRY (_start)
 
 SECTIONS
 {
-	/* Reserve 1MB of space */
-	. = 1M;
-
-	/* Text section */
-	.text BLOCK(4K) : ALIGN(4K)
+	.text K_VIR_START : AT(K_PHYS_START)
 	{
-		*(.multiboot)
-		*(.text)
+		KERNEL_INIT = .;
+		*(.init*)
+		. = ALIGN(PAGE_SIZE);
+		KERNEL_END_INIT = .;
+
+		KERNEL_TEXT = .;
+		*(.text*)
+		*(.rodata*)
+		. = ALIGN(PAGE_SIZE);
+		KERNEL_END_TEXT = .;
 	}
 
-	/* Read-only data section */
-	.rodata BLOCK(4K) : ALIGN(4K)
+	.data : AT(K_PHYS_START + (KERNEL_DATA - KERNEL_INIT))
 	{
-		*(.rodata)
+		KERNEL_DATA = .;
+		*(.data*)
+		. = ALIGN(PAGE_SIZE);
+		KERNEL_END_DATA = .;
 	}
 
-	/* Data section */
-	.data BLOCK(4K) : ALIGN(4K)
+	.bss : AT(K_PHYS_START + (KERNEL_BSS - KERNEL_INIT))
 	{
-		*(.data)
-	}
+		_stack_end = .;
+		. += K_STACK_SIZE;
+		_stack_start = .;
+		K_STACK_START = .;
 
-	/* BSS section */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
+		. = ALIGN( PAGE_SIZE );
+		KERNEL_BSS = .;
+		*(.bss*)
+		*(COMMON*)
+		. = ALIGN(PAGE_SIZE);
+		KERNEL_END_BSS = .;
 	}
+	. = ALIGN(PAGE_SIZE);
+	KERNEL_TOP = .;
 }
