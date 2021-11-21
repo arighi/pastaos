@@ -19,7 +19,7 @@ all: $(OBJS)
 	rm -rf isodir
 
 run: all
-	qemu-system-x86_64 -cdrom $(TARGET).iso
+	qemu-system-x86_64 -cdrom $(TARGET).iso -boot d
 
 tags:
 	ctags -R
