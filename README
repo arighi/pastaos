@@ -1,0 +1,62 @@
+What is PastaOS?
+================
+
+PastaOS is a simple open-source kernel written from scratch for didactic
+purposes.
+
+The main goal of this project is to help people that want to approach to kernel
+development to understand the basic concepts of a kernel.
+
+For this reason the code and functionalities are kept simple and minimal, so
+that people can easily understand how the kernel works and use it to implement
+their own project, as a kernel-dev sandbox.
+
+How do I run it?
+================
+
+Build the kernel:
+ $ make
+
+Create a bootable ISO (requires grub-mkrescue and xorriso):
+ $ make iso
+
+Start the kernel in VM (requires the above packages + qemu-system-x86_64):
+ $ make run
+
+Design
+======
+
+These are the features implemented so far:
+ - Intel x86 (32-bit) support
+
+ - Multi-threading (even if a scheduler does not exist yet, preemption model is
+   voluntary - threads need to voluntarily releases the CPU to schedule another
+   thread - the kernel provide a simple stack-switch mechanism to perform a
+   context switch between kernel threads)
+
+ - Paging is enabled, but there's no memory allocator at the moment (first 4MB
+   are identically mapped in the virtual address space and there's not memory
+   protection: all the memory is shared among the kernel threads)
+
+ - No user-space support yet, everything runs in kernel space as ring-0
+   privileges
+
+ - Simple 80x25 16-colors console driver
+
+ - Interrupt management (PIC 8259), only the periodic clock interrupt is
+   enabled for now
+
+ - GRUB integration (kernel can be booted using GRUB)
+
+Memory layout
+=============
+
+  .------------------------.    .------------------------.
+  |     Virtual memory     |    |     Physical memory    |
+  |0xc0000000 .. 0xc0100000| => |0x00000000 .. 0x00100000|
+  `------------------------'    `------------------------'
+
+Lower 4MB of physical memory is reserved to kernel and mapped into the virtual
+address space starting at 0xc000.0000.
+
+See linker.ld for more information about the memory layout.
