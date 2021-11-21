@@ -11,6 +11,8 @@ CFLAGS=-m32 -O2 -Wall -Wextra -fno-builtin -I.
 
 all: $(OBJS)
 	$(LD) -m elf_i386 -T linker.ld $(OBJS) -o $(TARGET) -nostdlib
+
+iso: all
 	rm -f $(TARGET).iso
 	mkdir -p isodir/boot/grub
 	cp $(TARGET) isodir/boot/
@@ -18,7 +20,7 @@ all: $(OBJS)
 	grub-mkrescue -o $(TARGET).iso isodir
 	rm -rf isodir
 
-run: all
+run: iso
 	qemu-system-x86_64 -cdrom $(TARGET).iso -boot d
 
 tags:
