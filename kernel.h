@@ -15,6 +15,9 @@ typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
 
+/* Amount of items in array */
+#define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
+
 /* Segment Constants */
 #define PRESENT		0x80    /* The segment is present */
 #define CODE		0x18    /* A code segment type */

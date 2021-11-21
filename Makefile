@@ -1,7 +1,8 @@
 TARGET=pastaos
-OBJS=boot.o init.o panic.o irq.o interrupt.o console.o clock.o main.o
+OBJS=boot.o init.o panic.o irq.o interrupt.o console.o clock.o sched.o main.o
 
-CFLAGS=-m32 -O2 -Wall -Wextra -fno-builtin -I.
+CFLAGS=-m32 -O2 -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -I.
+LDFLAGS=-g -nostdlib -X -lc
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
