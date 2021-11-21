@@ -1,8 +1,10 @@
 #include <interrupt.h>
+#include <clock.h>
 #include <console.h>
 
 void __init__ init(void)
 {
-	interrupt_init();
 	console_init();
+	interrupt_init();
+	clock_init();
 }

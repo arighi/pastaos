@@ -24,21 +24,6 @@
 /* Number of entries in the IDT */
 #define IDT_SIZE			256
 
-/* Save EFLAGS register */
-#define save_flags(flags)	\
-	__asm__ __volatile__ ("pushfl ; popl %0" : "=g"(flags) : )
-
-/* Restore EFLAGS register */
-#define restore_flags(flags)	\
-	__asm__ __volatile__ ("pushl %0 ; popfl" : : "g"(flags) : "memory", "cc")
-
-/* Save EFLAGS and disable interrupts */
-#define irq_save(flags)		\
-	__asm__ __volatile__ ("pushfl ; popl %0 ; cli" : "=g"(flags) : : "memory")
-
-/* Restore EFLAGS and enable interrupts */
-#define irq_restore(flags)	restore_flags(flags)
-
 /* The PIC irq mask */
 static uint16_t irq_mask = 0xffff;
 
@@ -209,8 +194,14 @@ static void pic_enable_irq(uint8_t irq)
 	irq_restore(flags);
 }
 
+/* End of interrupt routine: re-enable IRQ line in the PIC */
+void end_of_irq(irq_context_t *c)
+{
+	pic_enable_irq(c->irq);
+}
+
 /* Initialize the Programmable Interrupt Controllers (PICs) */
-void __init__ irq_init(void)
+static void irq_init(void)
 {
         /* Start initialization for master 8259a controller */
         out(PORT_8259_M, 0x11);
@@ -246,8 +237,7 @@ void default_irq_handler(irq_context_t *c)
                 irq_handler[c->irq].handler(c);
         else
                 unhandled_interrupt(c);
-	/* Re-enable IRQ on the PIC to end the IRQ handler */
-	pic_enable_irq(c->irq);
+	end_of_irq(c);
 }
 
 /* Set up an IDT entry */
@@ -318,7 +308,7 @@ extern void _exc_0F(void);
 extern void _exc_unhand(void);
 
 /* Initialize the IDT (Interrupt Descriptor Table) */
-static void __init__ init_idt(void)
+static void idt_init(void)
 {
 	int i;
 
@@ -395,7 +385,7 @@ int uninstall_interrupt_handler(int irq)
 }
 
 /* Install an interrupt handler */
-int install_interrupt_handler(int irq, void *handler)
+int install_interrupt_handler(int irq, void *handler, int type)
 {
         uint32_t flags;
 
@@ -404,7 +394,7 @@ int install_interrupt_handler(int irq, void *handler)
 
         irq_save(flags);
         irq_handler[irq].handler = handler;
-        idt[0x20 + irq].attribs = INT_GATE;
+        idt[0x20 + irq].attribs = type;
         pic_enable_irq(irq);
         irq_restore(flags);
 
@@ -413,6 +403,6 @@ int install_interrupt_handler(int irq, void *handler)
 
 void __init__ interrupt_init(void)
 {
+	idt_init();
 	irq_init();
-	init_idt();
 }

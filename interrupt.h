@@ -105,6 +105,10 @@ static inline void out32(uint16_t port, uint32_t val)
 	__asm__ __volatile__ ("outl %%eax, %%dx" : : "d" (port), "a" (val));
 }
 
+void end_of_irq(irq_context_t *c);
+int uninstall_interrupt_handler(int irq);
+int install_interrupt_handler(int irq, void *handler, int type);
+
 void __init__ interrupt_init(void);
 
 #endif /* INTERRUPT_H */
