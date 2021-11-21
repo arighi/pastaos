@@ -43,4 +43,9 @@ static inline void console_clear(void)
 	__console_clear(GREY, BLACK);
 }
 
+static inline void console_init(void)
+{
+	console_clear();
+}
+
 #endif /* CONSOLE_H */

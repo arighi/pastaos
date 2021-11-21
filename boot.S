@@ -115,6 +115,9 @@ Map_K_PTE:
 	movw	%ax, %ss
 	mov	$K_STACK_START, %esp
 
+	# Call init functions
+	call init
+
 	# Jump to the kernel main routine
 	call main
 
