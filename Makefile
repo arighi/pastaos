@@ -1,5 +1,5 @@
 TARGET=pastaos
-OBJS=boot.o exc.o exception.o irq.o interrupt.o console.o main.o
+OBJS=boot.o irq.o interrupt.o console.o main.o
 
 CFLAGS=-m32 -O2 -Wall -Wextra -fno-builtin -I.
 
