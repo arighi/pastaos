@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <kernel.h>
 #include <interrupt.h>
+#include <panic.h>
 
 /* PIC 8259 master */
 #define PORT_8259_M		0x20
@@ -88,6 +89,7 @@ static struct irq_desc irq_handler[IRQ_NR] __attribute__ ((__aligned__(16))) = {
 
 void default_exc_handler(exception_context_t __attribute__((__unused__)) *c)
 {
+	panic();
 }
 
 /* Check if the IRQ occurred can be considered spurious or real */
