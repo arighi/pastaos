@@ -17,7 +17,7 @@ How do I run it?
 Build the kernel:
  $ make
 
-Create a bootable ISO (requires grub-mkrescue and xorriso):
+Create a bootable ISO (requires grub-mkrescue, xorriso and mtools):
  $ make iso
 
 Start the kernel in VM (requires the above packages + qemu-system-x86_64):
