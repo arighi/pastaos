@@ -1,7 +1,7 @@
 TARGET=pastaos
 OBJS=boot.o init.o panic.o irq.o interrupt.o console.o clock.o sched.o main.o
 
-CFLAGS=-m32 -O2 -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -I.
+CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -I.
 LDFLAGS=-g -nostdlib -X -lc
 
 %.o: %.S
@@ -29,4 +29,6 @@ tags:
 
 clean:
 	rm -rf isodir
-	rm -f $(OBJS) $(TARGET) *.iso tags
+	rm -f $(OBJS) $(TARGET) *.d *.iso tags
+
+-include $(OBJS:.o=.d)
