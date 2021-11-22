@@ -10,9 +10,10 @@ enum {
 
 /* Task structure */
 struct task_struct {
-	void (*entry)(void);
+	int (*entry)(void);
 	uint32_t *sp;
 	int state;
+	int ret;
 };
 
 /* Main kernel task structure */
@@ -26,6 +27,6 @@ int switch_to(struct task_struct *task);
 
 /* Create and execute a new task */
 int task_run(struct task_struct *task,
-	     void (*entry)(void), uint32_t *stack, uint32_t size);
+	     int (*entry)(void), uint32_t *stack, uint32_t size);
 
 #endif /* SCHED_H */

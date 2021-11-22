@@ -60,6 +60,11 @@ int switch_to(struct task_struct *task)
 /* Task is exiting: clean-up routine */
 static void __exit_point(void)
 {
+	register int ret asm("eax");
+
+	/* Return code is passed using register eax according to the ABI */
+	current->ret = ret;
+
 	/* Set current task to zombie by cleaning its entry point */
 	current->state = TASK_ZOMBIE;
 	switch_to(&init_task);
@@ -82,7 +87,7 @@ static void __stack_init(struct task_struct *t)
 /* Initialize a new task structure */
 static void
 task_init(struct task_struct *t,
-	  void (*entry)(void), uint32_t *stack, uint32_t size)
+	  int (*entry)(void), uint32_t *stack, uint32_t size)
 {
 	t->entry = entry;
 	t->sp = &stack[size];
@@ -91,7 +96,7 @@ task_init(struct task_struct *t,
 
 /* Start a new task */
 int task_run(struct task_struct *task,
-	     void (*entry)(void), uint32_t *stack, uint32_t size)
+	     int (*entry)(void), uint32_t *stack, uint32_t size)
 {
 	task_init(task, entry, stack, size);
 	task->state = TASK_SLEEPING;

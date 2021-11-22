@@ -7,13 +7,14 @@
 static struct task_struct t1;
 static uint32_t s1[1024];
 
-static void task1(void)
+static int task1(void)
 {
 	while (1) {
 		console_putchar('B');
 		cpu_halt();
 		switch_to(&init_task);
 	}
+	return 0;
 }
 
 int main(void)
@@ -25,6 +26,5 @@ int main(void)
 		cpu_halt();
 		switch_to(&t1);
 	}
-
 	return 0;
 }
