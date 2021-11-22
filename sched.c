@@ -1,8 +1,15 @@
 #include <kernel.h>
 #include <sched.h>
 
+/* Dummy entry point for init task */
+static void __init_task_main(void)
+{
+}
+
 /* Initial kernel thread */
-struct task_struct init_task;
+struct task_struct init_task = {
+	.entry = __init_task_main,
+};
 
 /* Current running thread */
 struct task_struct *current = &init_task;
@@ -32,9 +39,32 @@ __switch_to(uint32_t *new_stack, uint32_t **old_stack)
 		              "r"(new_stack), "r"(old_stack) : "memory");
 }
 
+/* Switch to a different task (if possible) */
+int switch_to(struct task_struct *task)
+{
+	struct task_struct *prev = current;
+
+	/* Check if target task is zombie */
+	if (task->entry == NULL)
+		return -EINVAL;
+
+	current = task;
+	__switch_to(task->sp, &prev->sp);
+	return 0;
+}
+
+/* Task is exiting: clean-up routine */
+static void __exit_point(void)
+{
+	/* Set current task to zombie by cleaning its entry point */
+	current->entry = NULL;
+	switch_to(&init_task);
+}
+
 /* Initialize the stack for a new task */
 static void __stack_init(struct task_struct *t)
 {
+	*(--t->sp) = (uint32_t)__exit_point;	/* ret when task is done */
 	*(--t->sp) = (uint32_t)t->entry;	/* eip */
 	*(--t->sp) = 0;				/* eax */
 	*(--t->sp) = 0;				/* ecx */
