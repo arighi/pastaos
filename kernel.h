@@ -1,6 +1,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#include <errno.h>
+
 #define NULL		0
 
 typedef char int8_t;

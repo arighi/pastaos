@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <kernel.h>
 #include <interrupt.h>
 #include <panic.h>
