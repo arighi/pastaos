@@ -1,14 +1,10 @@
 #include <kernel.h>
+#include <panic.h>
 #include <sched.h>
-
-/* Dummy entry point for init task */
-static void __init_task_main(void)
-{
-}
 
 /* Initial kernel thread */
 struct task_struct init_task = {
-	.entry = __init_task_main,
+	.state = TASK_RUNNING,
 };
 
 /* Current running thread */
@@ -44,12 +40,20 @@ int switch_to(struct task_struct *task)
 {
 	struct task_struct *prev = current;
 
-	/* Check if target task is zombie */
-	if (task->entry == NULL)
+	switch (task->state) {
+	case TASK_ZOMBIE:
 		return -EINVAL;
-
+	case TASK_SLEEPING:
+		break;
+	default:
+		panic();
+	}
+	if (prev->state == TASK_RUNNING)
+		prev->state = TASK_SLEEPING;
+	task->state = TASK_RUNNING;
 	current = task;
 	__switch_to(task->sp, &prev->sp);
+
 	return 0;
 }
 
@@ -57,7 +61,7 @@ int switch_to(struct task_struct *task)
 static void __exit_point(void)
 {
 	/* Set current task to zombie by cleaning its entry point */
-	current->entry = NULL;
+	current->state = TASK_ZOMBIE;
 	switch_to(&init_task);
 }
 
@@ -90,6 +94,7 @@ int task_run(struct task_struct *task,
 	     void (*entry)(void), uint32_t *stack, uint32_t size)
 {
 	task_init(task, entry, stack, size);
+	task->state = TASK_SLEEPING;
 	switch_to(task);
 
 	return 0;
