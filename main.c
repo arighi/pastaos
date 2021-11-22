@@ -11,6 +11,7 @@ static void task1(void)
 {
 	while (1) {
 		console_putchar('B');
+		cpu_halt();
 		switch_to(&init_task);
 	}
 }
@@ -21,6 +22,7 @@ int main(void)
 
 	while (1) {
 		console_putchar('A');
+		cpu_halt();
 		switch_to(&t1);
 	}
 
