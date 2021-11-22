@@ -1,7 +1,5 @@
 #include <interrupt.h>
-
-/* Kernel timer clock frequency */
-#define HZ		100
+#include <clock.h>
 
 /* Clock driver definitions */
 #define CLOCK_IRQ		0x00		/* Kernel timer IRQ line */
