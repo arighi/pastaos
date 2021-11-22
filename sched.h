@@ -6,32 +6,20 @@ struct task_struct {
 	uint32_t *sp;
 };
 
-static inline void __stack_init(struct task_struct *t)
-{
-	*(--t->sp) = (uint32_t)t->entry;	/* eip */
-	*(--t->sp) = 0;				/* eax */
-	*(--t->sp) = 0;				/* ecx */
-	*(--t->sp) = 0;				/* edx */
-	*(--t->sp) = 0;				/* ebx */
-	*(--t->sp) = 0;				/* ebp */
-	*(--t->sp) = 0;				/* esi */
-	*(--t->sp) = 0;				/* edi */
-}
-
-static inline void
-task_init(struct task_struct *t,
-	  void (*entry)(void), uint32_t *stack, uint32_t size)
-{
-	t->entry = entry;
-	t->sp = &stack[size];
-	__stack_init(t);
-}
+extern struct task_struct init_task;
+extern struct task_struct *current;
 
 void __switch_to(uint32_t *new_stack, uint32_t **old_stack);
 
-static inline void switch_to(struct task_struct *next, struct task_struct *prev)
+static inline void switch_to(struct task_struct *task)
 {
-	__switch_to(next->sp, &prev->sp);
+	struct task_struct *prev = current;
+
+	current = task;
+	__switch_to(task->sp, &prev->sp);
 }
+
+int task_run(struct task_struct *task,
+	     void (*entry)(void), uint32_t *stack, uint32_t size);
 
 #endif /* SCHED_H */

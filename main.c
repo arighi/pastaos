@@ -2,29 +2,26 @@
 #include <console.h>
 #include <sched.h>
 #include <interrupt.h>
-
-#define STACK_SIZE	1024
-
-static struct task_struct main_task;
+#include <panic.h>
 
 static struct task_struct t1;
-static uint32_t s1[STACK_SIZE];
+static uint32_t s1[1024];
 
 static void task1(void)
 {
 	while (1) {
 		console_putchar('B');
-		switch_to(&main_task, &t1);
+		switch_to(&init_task);
 	}
 }
 
 int main(void)
 {
-	task_init(&t1, task1, s1, ARRAY_SIZE(s1));
+	task_run(&t1, task1, s1, ARRAY_SIZE(s1));
 
 	while (1) {
 		console_putchar('A');
-		switch_to(&t1, &main_task);
+		switch_to(&t1);
 	}
 
 	return 0;
