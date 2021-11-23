@@ -4,9 +4,6 @@
 #include <interrupt.h>
 #include <panic.h>
 
-static struct task_struct t1;
-static uint32_t s1[1024];
-
 static int task1(void)
 {
 	while (1) {
@@ -17,9 +14,11 @@ static int task1(void)
 	return 0;
 }
 
+static DECLARE_TASK(t1, task1);
+
 int main(void)
 {
-	task_run(&t1, task1, s1, ARRAY_SIZE(s1));
+	task_run(&t1);
 
 	while (1) {
 		console_putchar('A');

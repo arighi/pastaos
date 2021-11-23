@@ -85,9 +85,8 @@ static void __stack_init(struct task_struct *t)
 }
 
 /* Initialize a new task structure */
-static void
-task_init(struct task_struct *t,
-	  int (*entry)(void), uint32_t *stack, uint32_t size)
+void task_init(struct task_struct *t,
+	       int (*entry)(void), uint32_t *stack, uint32_t size)
 {
 	t->entry = entry;
 	t->sp = &stack[size];
@@ -95,10 +94,9 @@ task_init(struct task_struct *t,
 }
 
 /* Start a new task */
-int task_run(struct task_struct *task,
-	     int (*entry)(void), uint32_t *stack, uint32_t size)
+int task_run(struct task_struct *task)
 {
-	task_init(task, entry, stack, size);
+	task_init(task, task->entry, task->stack, STACK_SIZE);
 	task->state = TASK_SLEEPING;
 	switch_to(task);
 

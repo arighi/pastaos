@@ -20,6 +20,10 @@ typedef unsigned long long uint64_t;
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
 
+/* Page size */
+#define PAGE_SHIFT	12
+#define PAGE_SIZE	(1 << PAGE_SHIFT)
+
 /* Segment Constants */
 #define PRESENT		0x80    /* The segment is present */
 #define CODE		0x18    /* A code segment type */
