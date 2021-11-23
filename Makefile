@@ -1,15 +1,25 @@
 TARGET=pastaos
-OBJS=boot.o init.o panic.o irq.o interrupt.o console.o clock.o sched.o main.o
 
-CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -I.
+# Automatically detect sources in sub-folders
+build-dirs = $(wildcard */)
+SRCS=$(wildcard $(addsuffix *.c, $(build-dirs))) $(wildcard $(addsuffix *.S, $(build-dirs)))
+OBJS=$(patsubst %.c, %.o, $(filter %c, $(SRCS))) $(patsubst %.S, %.o, $(filter %S, $(SRCS)))
+
+# Properly support header dependencies
+-include $(OBJS:.o=.d)
+
+# Compiler options
+CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -Iinclude
 LDFLAGS=-g -nostdlib -X -lc
 
+# Build rules
 %.o: %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+# Makefile targets
 all: $(OBJS)
 	$(LD) -m elf_i386 -T linker.ld $(OBJS) -o $(TARGET) -nostdlib
 
@@ -29,6 +39,4 @@ tags:
 
 clean:
 	rm -rf isodir
-	rm -f $(OBJS) $(TARGET) *.d *.iso tags
-
--include $(OBJS:.o=.d)
+	rm -f $(OBJS) $(TARGET) $(patsubst %.o, %.d, $(OBJS)) *.iso tags
