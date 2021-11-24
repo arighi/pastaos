@@ -3,7 +3,7 @@
 
 #include <errno.h>
 
-#define NULL		0
+#define NULL		((void *)0)
 
 typedef char int8_t;
 typedef unsigned char uint8_t;
@@ -17,8 +17,42 @@ typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
 
+typedef int bool;
+
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
+
+/*
+ * Memory barrier
+ *
+ * Force strict CPU ordering (required to preserve the order of execution).
+ */
+#define barrier() \
+        __asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory")
+
+/* Prevent compiler from reordering reads or writes when READ_ONCE() is used */
+#define READ_ONCE(x) (*(const volatile typeof(x) *)&(x))
+
+/* Prevent compiler from reordering reads or writes when WRITE_ONCE() is used */
+#define WRITE_ONCE(x, val)					\
+	do {							\
+		*(volatile typeof(x) *)&(x) = (val);		\
+	} while (0)
+
+/* Write to memory safely (prevent CPU reordering) */
+#define smp_store_release(p, v)					\
+do {								\
+        barrier();						\
+        WRITE_ONCE(*p, v);					\
+} while (0)
+
+/* Read from memory safely (prevent CPU reordering) */
+#define smp_load_acquire(p)					\
+({								\
+        typeof(*p) ___p1 = READ_ONCE(*p);			\
+        barrier();						\
+        ___p1;							\
+})
 
 /* Page size */
 #define PAGE_SHIFT	12
