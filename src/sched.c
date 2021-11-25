@@ -1,6 +1,10 @@
 #include <kernel.h>
 #include <panic.h>
+#include <interrupt.h>
 #include <sched.h>
+
+/* List of tasks */
+static LIST_HEAD(task_list);
 
 /* Initial kernel thread */
 struct task_struct init_task = {
@@ -11,8 +15,8 @@ struct task_struct init_task = {
 struct task_struct *current = &init_task;
 
 /* Low-level context switch routine to perform a stack switch */
-void __attribute__ ((__noinline__))
-__switch_to(uint32_t *new_stack, uint32_t **old_stack)
+static void __attribute__ ((__noinline__))
+switch_to(uint32_t *new_stack, uint32_t **old_stack)
 {
 	__asm__ __volatile__(
 		     "pushl %%eax\n"
@@ -35,30 +39,49 @@ __switch_to(uint32_t *new_stack, uint32_t **old_stack)
 		              "r"(new_stack), "r"(old_stack) : "memory");
 }
 
-/* Switch to a different task (if possible) */
-int switch_to(struct task_struct *task)
+/* Main scheduler function */
+void schedule(void)
 {
-	struct task_struct *prev = current;
+	struct task_struct *prev, *next;
 
-	switch (task->state) {
+	/*
+	 * Pop the next task from the task list, if there's a different task to
+	 * run.
+	 */
+	prev = current;
+	next = list_first_entry_or_null(&task_list, struct task_struct, next);
+	if (!next || next == prev)
+		return;
+
+	/* Update current task state */
+	switch (prev->state) {
+	case TASK_RUNNING:
+		current->state = TASK_SLEEPING;
+		list_add_tail(&current->next, &task_list);
+		break;
 	case TASK_ZOMBIE:
-		return -EINVAL;
-	case TASK_SLEEPING:
 		break;
 	default:
 		panic();
 	}
-	if (prev->state == TASK_RUNNING)
-		prev->state = TASK_SLEEPING;
-	task->state = TASK_RUNNING;
-	current = task;
-	__switch_to(task->sp, &prev->sp);
 
-	return 0;
+	/* Update next task state */
+	switch (next->state) {
+	case TASK_SLEEPING:
+		next->state = TASK_RUNNING;
+		list_del_init(&next->next);
+		current = next;
+		break;
+	default:
+		panic();
+	}
+
+	/* Switch to the next task */
+	switch_to(next->sp, &prev->sp);
 }
 
 /* Task is exiting: clean-up routine */
-static void __exit_point(void)
+static void exit_point(void)
 {
 	register int ret asm("eax");
 
@@ -67,38 +90,47 @@ static void __exit_point(void)
 
 	/* Set current task to zombie by cleaning its entry point */
 	current->state = TASK_ZOMBIE;
-	switch_to(&init_task);
+	schedule();
 }
 
 /* Initialize the stack for a new task */
-static void __stack_init(struct task_struct *t)
+static void stack_init(struct task_struct *task)
 {
-	*(--t->sp) = (uint32_t)__exit_point;	/* ret when task is done */
-	*(--t->sp) = (uint32_t)t->entry;	/* eip */
-	*(--t->sp) = 0;				/* eax */
-	*(--t->sp) = 0;				/* ecx */
-	*(--t->sp) = 0;				/* edx */
-	*(--t->sp) = 0;				/* ebx */
-	*(--t->sp) = 0;				/* ebp */
-	*(--t->sp) = 0;				/* esi */
-	*(--t->sp) = 0;				/* edi */
+	*(--task->sp) = (uint32_t)exit_point;	/* ret when task is done */
+	*(--task->sp) = (uint32_t)task->entry;	/* eip */
+	*(--task->sp) = 0;			/* eax */
+	*(--task->sp) = 0;			/* ecx */
+	*(--task->sp) = 0;			/* edx */
+	*(--task->sp) = 0;			/* ebx */
+	*(--task->sp) = 0;			/* ebp */
+	*(--task->sp) = 0;			/* esi */
+	*(--task->sp) = 0;			/* edi */
 }
 
 /* Initialize a new task structure */
-void task_init(struct task_struct *t,
-	       int (*entry)(void), uint32_t *stack, uint32_t size)
+static void task_init(struct task_struct *task,
+		      int (*entry)(void), uint32_t *stack, uint32_t size)
 {
-	t->entry = entry;
-	t->sp = &stack[size];
-	__stack_init(t);
+	/* Initialize task entry point */
+	task->entry = entry;
+
+	/* Initialize task stack */
+	task->sp = &stack[size];
+	stack_init(task);
+
+	/* Add task to the task list as sleeping */
+	task->state = TASK_SLEEPING;
+	list_add(&task->next, &task_list);
 }
 
 /* Start a new task */
 int task_run(struct task_struct *task)
 {
+	/* Initialize task */
 	task_init(task, task->entry, task->stack, STACK_SIZE);
-	task->state = TASK_SLEEPING;
-	switch_to(task);
+
+	/* Call the scheduler */
+	schedule();
 
 	return 0;
 }

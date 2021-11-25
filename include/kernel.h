@@ -19,8 +19,17 @@ typedef unsigned long long uint64_t;
 
 typedef int bool;
 
+typedef unsigned long size_t;
+
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
+
+/* Get the offset of a member inside a struct */
+#define offsetof(__s, __m)	((size_t)&((__s *)0)->__m)
+
+/* Get the object that contains a specific member */
+#define container_of(__ptr, __type, __member) \
+	((__type *)(void *)((char *)(__ptr) - offsetof(__type, __member)))
 
 /*
  * Memory barrier

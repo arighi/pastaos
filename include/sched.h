@@ -1,6 +1,8 @@
 #ifndef SCHED_H
 #define SCHED_H
 
+#include <list.h>
+
 /* Default stack size */
 #define STACK_SIZE	PAGE_SIZE
 
@@ -19,6 +21,7 @@ enum {
 
 /* Task structure */
 struct task_struct {
+	struct list_head next;
 	uint32_t stack[STACK_SIZE];
 	uint32_t *sp;
 	int (*entry)(void);
@@ -26,21 +29,11 @@ struct task_struct {
 	int ret;
 };
 
-/* Main kernel task structure */
-extern struct task_struct init_task;
-
 /* Current running task */
 extern struct task_struct *current;
 
-/* Context switch to a different task */
-int switch_to(struct task_struct *task);
-
-/*
- * Initialize a task with custom parameters (e.g., different stack size, or a
- * different entry point).
- */
-void task_init(struct task_struct *t,
-	       int (*entry)(void), uint32_t *stack, uint32_t size);
+/* Call the scheduler */
+void schedule(void);
 
 /* Create and execute a new task */
 int task_run(struct task_struct *task);

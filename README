@@ -29,10 +29,10 @@ Design
 These are the features implemented so far:
  - Intel x86 (32-bit) support
 
- - Multi-threading (even if a scheduler does not exist yet, preemption model is
-   voluntary - threads need to voluntarily releases the CPU to schedule another
-   thread - the kernel provide a simple stack-switch mechanism to perform a
-   context switch between kernel threads)
+ - Multi-threading (the kernel implements a simple round-robin scheduler,
+   preemption model is voluntary: threads need to voluntarily release the CPU
+   to schedule the next thread; the kernel provide a simple stack-switch
+   mechanism to perform a context switch between kernel threads)
 
  - Paging is enabled, but there's no memory allocator at the moment (first 4MB
    are identically mapped in the virtual address space and there's not memory

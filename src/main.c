@@ -9,7 +9,7 @@ static int task1(void)
 	while (1) {
 		console_putchar('B');
 		cpu_halt();
-		switch_to(&init_task);
+		schedule();
 	}
 	return 0;
 }
@@ -23,7 +23,7 @@ int main(void)
 	while (1) {
 		console_putchar('A');
 		cpu_halt();
-		switch_to(&t1);
+		schedule();
 	}
 	return 0;
 }
