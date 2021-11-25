@@ -5,9 +5,6 @@ build-dirs = $(wildcard */)
 SRCS=$(wildcard $(addsuffix *.c, $(build-dirs))) $(wildcard $(addsuffix *.S, $(build-dirs)))
 OBJS=$(patsubst %.c, %.o, $(filter %c, $(SRCS))) $(patsubst %.S, %.o, $(filter %S, $(SRCS)))
 
-# Properly support header dependencies
--include $(OBJS:.o=.d)
-
 # Compiler options
 CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -Iinclude
 LDFLAGS=-g -nostdlib -X -lc
@@ -40,3 +37,6 @@ tags:
 clean:
 	rm -rf isodir
 	rm -f $(OBJS) $(TARGET) $(patsubst %.o, %.d, $(OBJS)) *.iso tags
+
+# Properly support header dependencies
+-include $(OBJS:.o=.d)
