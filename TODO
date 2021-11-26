@@ -1,0 +1,29 @@
+TODO
+====
+
+Here's a list of some potential projects that can be done in the future:
+
+ - focus on debugging / CI:
+	 - implement printk() for better debugging
+	 - provide a kernel log
+	 - implement stack traces
+	 - unit tests
+
+ - provide basic locking primitives
+
+ - memory allocator
+
+ - virtual memory / paging
+
+ - time tracking / sleep interface / RTC driver
+
+ - keyboard driver
+
+ - provide a simple shell that accepts interactive commands
+
+ - user-space / kernel-space isolation (+ syscall interface)
+
+ - provide a simple user-space libc integrated with the kernel to compile
+   user-space applications
+
+ - networking / TCP/IP support
