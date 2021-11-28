@@ -1,4 +1,7 @@
+#include <stdarg.h>
 #include <console.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #define LAST_LINE (CONSOLE_WIDTH * (CONSOLE_HEIGHT - 1))
 
@@ -19,9 +22,28 @@ static void console_scroll_up(void)
 	console_pos -= CONSOLE_WIDTH;
 }
 
-void console_putchar(uint8_t c)
+void kputchar(uint8_t c)
 {
-	console_buffer[console_pos++] = console_entry(c, GREY, BLACK);
+	switch (c) {
+	case '\n':
+		console_pos += CONSOLE_WIDTH;
+		console_pos -= console_pos % CONSOLE_WIDTH;
+		break;
+	case '\r':
+		console_pos -= console_pos % CONSOLE_WIDTH;
+		break;
+	case '\t':
+		console_pos += 8;
+		break;
+	case '\b':
+		if (console_pos > 0)
+			console_buffer[--console_pos] = console_entry(' ', WHITE, BLACK);
+		break;
+	default:
+		console_buffer[console_pos++] = console_entry(c, GREY, BLACK);
+		break;
+	}
+
 	if (console_pos >= CONSOLE_BUFSIZE)
 		console_scroll_up();
 }
@@ -33,4 +55,24 @@ void __console_clear(uint8_t fg, uint8_t bg)
 	console_pos = 0;
 	for (i = 0; i < CONSOLE_BUFSIZE; i++)
 		console_buffer[i] = console_entry(0, fg, bg);
+}
+
+int printk(const char *fmt, ...)
+{
+	char buf[1024];
+	va_list args;
+	unsigned int i;
+
+	va_start(args, fmt);
+
+	vsnprintf( buf, sizeof(buf), fmt, args );
+	va_end(args);
+
+	for (i = 0; i < sizeof(buf); i++) {
+		if (!buf[i])
+			break;
+		kputchar(buf[i]);
+	}
+
+	return i;
 }

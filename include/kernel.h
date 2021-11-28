@@ -2,24 +2,8 @@
 #define KERNEL_H
 
 #include <errno.h>
-
-#define NULL		((void *)0)
-
-typedef char int8_t;
-typedef unsigned char uint8_t;
-
-typedef short int16_t;
-typedef unsigned short uint16_t;
-
-typedef int int32_t;
-typedef unsigned int uint32_t;
-
-typedef long long int64_t;
-typedef unsigned long long uint64_t;
-
-typedef int bool;
-
-typedef unsigned long size_t;
+#include <types.h>
+#include <compiler.h>
 
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
@@ -30,6 +14,7 @@ typedef unsigned long size_t;
 /* Get the object that contains a specific member */
 #define container_of(__ptr, __type, __member) \
 	((__type *)(void *)((char *)(__ptr) - offsetof(__type, __member)))
+
 
 /*
  * Memory barrier
@@ -98,11 +83,5 @@ do {								\
 #define KERNEL_STACK		0x08
 /* This is the code selector segment for the kernel */
 #define KERNEL_CODE		0x10
-
-/*
- * Initialization routine: memory occupied by this routine can be freed after
- * kernel initialization is completed.
- */
-#define __init__	__attribute__((__section__(".init")))
 
 #endif /* KERNEL_H */

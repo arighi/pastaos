@@ -34,7 +34,9 @@ static inline uint16_t console_entry(unsigned char ch, uint8_t fg, uint8_t bg)
 	return bg << 12 | fg << 8 | ch;
 }
 
-void console_putchar(uint8_t c);
+void kputchar(uint8_t c);
+
+int printk(const char *fmt, ...);
 
 void __console_clear(uint8_t fg, uint8_t bg);
 

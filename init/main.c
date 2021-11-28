@@ -7,7 +7,7 @@
 static int task1(void)
 {
 	while (1) {
-		console_putchar('B');
+		printk("%s\n", "hello from task1");
 		cpu_halt();
 		schedule();
 	}
@@ -21,7 +21,7 @@ int main(void)
 	task_run(&t1);
 
 	while (1) {
-		console_putchar('A');
+		printk("%s\n", "hello from init");
 		cpu_halt();
 		schedule();
 	}
