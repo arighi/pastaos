@@ -41,7 +41,7 @@ iso: all
 	$(Q)rm -rf isodir
 
 run: iso
-	$(Q)qemu-system-x86_64 -cdrom $(TARGET).iso -boot d
+	$(Q)qemu-system-x86_64 -cdrom $(TARGET).iso -boot d -curses
 
 tags:
 	@echo CTAGS  $@

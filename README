@@ -23,6 +23,8 @@ Create a bootable ISO (requires grub-mkrescue, xorriso and mtools):
 Start the kernel in VM (requires the above packages + qemu-system-x86_64):
  $ make run
 
+NOTE: press `Alt+2` to enter the qemu monitor and type `quit` to exit.
+
 Design
 ======
 
