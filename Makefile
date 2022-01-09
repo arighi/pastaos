@@ -6,7 +6,7 @@ SRCS=$(wildcard $(addsuffix *.c, $(build-dirs))) $(wildcard $(addsuffix *.S, $(b
 OBJS=$(patsubst %.c, %.o, $(filter %c, $(SRCS))) $(patsubst %.S, %.o, $(filter %S, $(SRCS)))
 
 # Compiler options
-CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -Iinclude
+CFLAGS=-m32 -O2 -MD -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -Iinclude -fno-pie
 LDFLAGS=-g -nostdlib -X -lc
 
 ifeq ("$(origin V)", "command line")
