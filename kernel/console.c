@@ -1,12 +1,23 @@
 #include <stdarg.h>
+#include <io.h>
 #include <console.h>
 #include <stdio.h>
 #include <stdarg.h>
 
+#define VIDEO_CRT_PORT		0x03d4
 #define LAST_LINE (CONSOLE_WIDTH * (CONSOLE_HEIGHT - 1))
 
 static uint16_t *console_buffer = (uint16_t *)CONSOLE_ADDRESS;
 int console_pos;
+
+/* Update cursor position on video */
+static void refresh_cursor(void)
+{
+	outb(14, VIDEO_CRT_PORT + 0);
+	outb(console_pos >> 8, VIDEO_CRT_PORT + 1);
+	outb(15, VIDEO_CRT_PORT + 0);
+	outb(console_pos & 0xff, VIDEO_CRT_PORT + 1);
+}
 
 static void console_scroll_up(void)
 {
@@ -43,9 +54,9 @@ void kputchar(uint8_t c)
 		console_buffer[console_pos++] = console_entry(c, GREY, BLACK);
 		break;
 	}
-
 	if (console_pos >= CONSOLE_BUFSIZE)
 		console_scroll_up();
+	refresh_cursor();
 }
 
 void __console_clear(uint8_t fg, uint8_t bg)
@@ -55,6 +66,7 @@ void __console_clear(uint8_t fg, uint8_t bg)
 	console_pos = 0;
 	for (i = 0; i < CONSOLE_BUFSIZE; i++)
 		console_buffer[i] = console_entry(0, fg, bg);
+	refresh_cursor();
 }
 
 int printk(const char *fmt, ...)
