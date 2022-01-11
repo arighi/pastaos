@@ -1,4 +1,5 @@
 .global _start
+.extern KERNEL_STACK_BEGIN
 
 #define MULTIBOOT_HEADER_MAGIC  (0x1BADB002)
 #define MULTIBOOT_HEADER_FLAGS	0
@@ -14,6 +15,7 @@ _start:
 .align 4
 
 entry:
+	mov $KERNEL_STACK_BEGIN, %esp
 	pushl $0xdeadbeef
 	pushl $0x01
 	call main
