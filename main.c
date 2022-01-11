@@ -40,6 +40,21 @@ enum color {
 static uint16_t *console_buffer = (unsigned short *)CONSOLE_ADDRESS;
 static int console_pos;
 
+#define CONSOLE_PORT	0x03d4
+
+static inline void outb(uint16_t port, uint8_t val)
+{
+	asm volatile("outb %%al, %%dx" : : "d"(port), "a"(val));
+}
+
+static void update_cursor(void)
+{
+	outb(CONSOLE_PORT + 0, 14);
+	outb(CONSOLE_PORT + 1, console_pos >> 8);
+	outb(CONSOLE_PORT + 0, 15);
+	outb(CONSOLE_PORT + 1, console_pos & 0xff);
+}
+
 static void print_char(char c, char color)
 {
 	console_buffer[console_pos++] = (color << 8 | c);
@@ -47,17 +62,18 @@ static void print_char(char c, char color)
 		console_pos = 0;
 }
 
-static void printk(const char *str)
+void printk(const char *str)
 {
 	char c;
 
 	while ((c = *str++))
 		print_char(c, GREY);
+	update_cursor();
 }
 
 /* kernel main */
 
-int main(int argc, char **argv)
+int main(int argc, char **argv __attribute__ ((__unused__)))
 {
 	if (argc == 1)
 		printk("hello world");
