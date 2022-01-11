@@ -55,9 +55,20 @@ static void update_cursor(void)
 	outb(CONSOLE_PORT + 1, console_pos & 0xff);
 }
 
+#define CONSOLE_WIDTH	80
+#define CONSOLE_HEIGHT	25
+
 static void print_char(char c, char color)
 {
-	console_buffer[console_pos++] = (color << 8 | c);
+	switch (c) {
+	case '\n':
+		console_pos += CONSOLE_WIDTH;
+		console_pos -= console_pos % CONSOLE_WIDTH;
+		break;
+	default:
+		console_buffer[console_pos++] = (color << 8 | c);
+		break;
+	}
 	if (console_pos >= 80 * 25)
 		console_pos = 0;
 }
