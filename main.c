@@ -1,5 +1,7 @@
 /* types */
 
+#define NULL	0
+
 typedef char int8_t;
 typedef unsigned char uint8_t;
 
@@ -82,11 +84,96 @@ void printk(const char *str)
 	update_cursor();
 }
 
+/* scheduler */
+
+#define PAGE_SIZE	0x1000
+#define STACK_SIZE	PAGE_SIZE
+
+struct task_struct {
+	uint32_t stack[STACK_SIZE / sizeof(uint32_t)];
+	uint32_t *sp;
+	void (*entry)(void);
+};
+
+static struct task_struct init_task = {
+	.entry = NULL,
+};
+
+static void stack_init(struct task_struct *task)
+{
+	task->sp = &task->stack[STACK_SIZE / sizeof(uint32_t)];
+	*(--task->sp) = (uint32_t)task->entry;	/* eip */
+	*(--task->sp) = 0;			/* eax */
+	*(--task->sp) = 0;			/* ebx */
+	*(--task->sp) = 0;			/* ecx */
+	*(--task->sp) = 0;			/* edx */
+	*(--task->sp) = 0;			/* ebp */
+	*(--task->sp) = 0;			/* esi */
+	*(--task->sp) = 0;			/* edi */
+}
+
+static void task_init(struct task_struct *task, void (*entry)(void))
+{
+	task->entry = entry;
+	stack_init(task);
+}
+
+static void switch_to(struct task_struct *new, struct task_struct *old)
+{
+	register uint32_t old_sp = (uint32_t)&old->sp;
+	register uint32_t new_sp = (uint32_t)new->sp;
+
+	asm volatile(
+		/* Push general purpose registers */
+		"pushl %%eax\n"
+		"pushl %%ebx\n"
+		"pushl %%ecx\n"
+		"pushl %%edx\n"
+		"pushl %%ebp\n"
+		"pushl %%esi\n"
+		"pushl %%edi\n"
+
+		/* Stack switch */
+		"mov %%esp, (%1)\n"
+		"mov %0, %%esp\n"
+
+		/* Pop general purpose registers */
+		"popl %%edi\n"
+		"popl %%esi\n"
+		"popl %%ebp\n"
+		"popl %%edx\n"
+		"popl %%ecx\n"
+		"popl %%ebx\n"
+		"popl %%eax\n"
+
+		/* Return */
+		"ret"
+		: "=r"(new_sp), "=r"(old_sp) : "r"(new_sp), "r"(old_sp) : "memory"
+	);
+}
+
+static struct task_struct t1;
+
+static void task1(void)
+{
+	while (1) {
+		printk("hello from task1\n");
+		switch_to(&init_task, &t1);
+	}
+}
+
 /* kernel main */
 
-int main(int argc, char **argv __attribute__ ((__unused__)))
+static struct task_struct init_task;
+
+int main(int argc __attribute__ ((__unused__)), char **argv __attribute__ ((__unused__)))
 {
-	if (argc == 1)
-		printk("hello world");
+	task_init(&t1, task1);
+
+	while (1) {
+		printk("hello from main\n");
+		switch_to(&t1, &init_task);
+	}
+
 	return 0;
 }
