@@ -17,8 +17,11 @@ entry:
 	pushl $0xdeadbeef
 	pushl $0x01
 	call main
+	pop %eax
+	pop %eax
 
+dead:
 	# dead end
 	cli
 	hlt
-	jmp entry
+	jmp dead
