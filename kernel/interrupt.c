@@ -364,9 +364,6 @@ static void idt_init(void)
 
 	/* Load info into IDTR register */
 	__asm__ __volatile__ ("lidtl (%0)" : : "r"((uint32_t)&idt_ptr));
-
-	/* Enable interrupts */
-	irq_enable();
 }
 
 /* Uninstall an interrupt handler */
@@ -406,4 +403,7 @@ void __init__ interrupt_init(void)
 {
 	idt_init();
 	irq_init();
+
+	/* Enable interrupts */
+	irq_enable();
 }
