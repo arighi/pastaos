@@ -36,15 +36,10 @@ _##name:				\
 ALIGN
 __common_isr:
 	cld
-	# Saving segment registers; get rid of
-	# %gs and %fs registers because the kernel
-	# does not use them.
-	# For the user tasks registers %fs, %gs are
-	# correctly stored into their TSS, so we
-	# have no trouble during a task switch.
+	# Save segment registers.
 	push	%ds
 	push	%es
-	# Saving general purpose registers.
+	# Save general purpose registers.
 	pushl	%eax
 	pushl	%ecx
 	pushl	%edx
@@ -52,11 +47,6 @@ __common_isr:
 	pushl	%ebp
 	pushl	%esi
 	pushl	%edi
-	# Update segment registers with the kernel
-	# data segment.
-	movw	$KERNEL_DATA_SEL, %bx
-	movw	%bx, %ds
-	movw	%bx, %es
 	# Call the default handler;
 	#     void default_handler(irq_context_t *c);
 	pushl	%esp
@@ -87,12 +77,10 @@ ret_from_isr:
 ALIGN
 COMMON_EXC:
 	cld
-	# Saving segment registers; get rid of
-	# %gs and %fs registers because the kernel
-	# does not use them.
+	# Save segment registers.
 	push	%ds
 	push	%es
-	# Saving general purpose registers.
+	# Save general purpose registers.
 	pushl	%eax
 	pushl	%ecx
 	pushl	%edx
@@ -100,11 +88,6 @@ COMMON_EXC:
 	pushl	%ebp
 	pushl	%esi
 	pushl	%edi
-	# Update segment registers with the kernel
-	# data segment.
-	movw	$KERNEL_DATA_SEL, %bx
-	movw	%bx, %ds
-	movw	%bx, %es
 	# Call the default exception handler;
 	#     void default_exception(exc_context_t *c);
 	pushl	%esp
