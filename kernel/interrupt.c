@@ -1,6 +1,7 @@
 #include <kernel.h>
-#include <interrupt.h>
+#include <console.h>
 #include <panic.h>
+#include <interrupt.h>
 
 /* PIC 8259 master */
 #define PORT_8259_M		0x20
@@ -71,8 +72,9 @@ static struct irq_desc irq_handler[IRQ_NR] __attribute__ ((__aligned__(16))) = {
 	}
 };
 
-void default_exc_handler(exception_context_t __attribute__((__unused__)) *c)
+void default_exc_handler(exception_context_t *c)
 {
+	printk("exception: %d\n", c->exc);
 	panic();
 }
 

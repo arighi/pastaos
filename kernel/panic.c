@@ -5,7 +5,7 @@
 /* Kernel is dead */
 void panic(void)
 {
-	__console_clear(RED, RED);
+	printk("Kernel panic. Have a nice day.");
 	irq_disable();
 	for (;;)
 		cpu_halt();

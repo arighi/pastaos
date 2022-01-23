@@ -1,4 +1,3 @@
-#define KERNEL_DATA_SEL         0x08
 #define ALIGN                   .align 16
 
 .text
