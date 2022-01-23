@@ -22,7 +22,7 @@ enum {
 /* Task structure */
 struct task_struct {
 	struct list_head next;
-	uint32_t stack[STACK_SIZE];
+	uint32_t stack[STACK_SIZE / sizeof(uint32_t)];
 	uint32_t *sp;
 	int (*entry)(void);
 	int state;
