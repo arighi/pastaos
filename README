@@ -53,12 +53,4 @@ These are the features implemented so far:
 Memory layout
 =============
 
-  .------------------------.    .------------------------.
-  |     Virtual memory     |    |     Physical memory    |
-  |0xc0000000 .. 0xc0100000| => |0x00000000 .. 0x00100000|
-  `------------------------'    `------------------------'
-
-Lower 4MB of physical memory is reserved to kernel and mapped into the virtual
-address space starting at 0xc000.0000.
-
-See linker.ld for more information about the memory layout.
+See linker.ld for information about kernel memory layout.
