@@ -1,31 +1,5 @@
 .section .init
 
-# Address adjustement
-#define ADDRADJUST	0xBFF00000
-
-# Kernel virtual start address
-#define K_VIR_START	0xC0000000
-
-# Kernel physiscal start address
-#define K_PHYS_START	0x100000
-
-# Paging constants
-#define	P_PRESENT 	0x01
-#define P_WRITE		0x02
-
-# Page size
-#define PAGE_SHIFT	12
-#define PAGE_SIZE	(1 << PAGE_SHIFT)
-
-# Page directory
-#define K_PDE		0x1000
-
-# Kernel page table #0 (4MB)
-#define K_PTE		0x2000
-
-# First 4MB Identity-map page table
-#define I_PTE		0x3000
-
 # Multiboot constants
 #define MULTIBOOT_PAGE_ALIGN	(1 << 0)
 #define MULTIBOOT_MEMORY_INFO	(1 << 1)
@@ -53,50 +27,7 @@ _start:
 	boot_info: .long	0
 entry:
 	# Save multiboot structure pointer.
-	mov	%ebx, (boot_info - ADDRADJUST)
-
-	# Setup paging
-	xorl	%eax, %eax
-	mov	$K_PDE, %edi
-	mov	$1024, %ecx
-	cld
-	rep	stosl
-
-	# Setup first 4MB as identity-map (I_PTE)
-	mov	$(P_PRESENT | P_WRITE), %eax
-	mov	$1024, %ecx
-	mov	$I_PTE, %edi
-Map_I_PTE:
-	stosl
-	add	$PAGE_SIZE, %eax
-	loop	Map_I_PTE
-
-	# Setup the kernel page table (K_PTE)
-	mov	$(K_PHYS_START | P_PRESENT | P_WRITE), %eax
-	mov	$1024, %ecx
-	mov	$K_PTE, %edi
-Map_K_PTE:
-	stosl
-	add	$PAGE_SIZE, %eax
-	loop	Map_K_PTE
-
-	# Store the identity-map table (first 4MB)
-	movl $(I_PTE | P_PRESENT | P_WRITE), K_PDE
-
-	# Store the kernel table (4MB of kernel virtual space)
-	movl $(K_PTE | P_PRESENT | P_WRITE), K_PDE + (K_VIR_START >> PAGE_SHIFT) / 1024 * 4
-
-	# Map page directory into itself
-	movl $(K_PDE | P_PRESENT | P_WRITE), K_PDE + 1023 * 4
-
-	# Setup PDBR
-	mov	$K_PDE, %eax
-	mov	%eax, %cr3
-
-	# Enable paging
-	mov	%cr0, %eax
-	orl	$0x80010000, %eax # cr0.PG = cr0.WP = 1
-	mov	%eax, %cr0
+	mov	%ebx, (boot_info)
 
 	# Reload global descriptor table (GDT)
 	lgdtl	(gdtr)
@@ -130,7 +61,7 @@ _done:
 .align 4
 gdtr:
 	.word (gdt_end - gdt - 1)	# GDT limit
-	.long (gdt - ADDRADJUST)	# GDT linear address
+	.long (gdt)			# GDT linear address
 
 .align 4
 gdt:
