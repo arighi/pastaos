@@ -58,7 +58,7 @@ do {								\
 #define DATA		0x10    /* A data segment type */
 #define EXP_DOWN	0x04    /* The segment grows downward */
 #define CONFORMING	0x04    /* A conforming code segment */
-#define READABLE	0x02    /* A readable segment */
+#define READABLE	0x00    /* A readable segment */
 #define WRITEABLE	0x02    /* A writeable segment */
 
 /* A standard code segment */
