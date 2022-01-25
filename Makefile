@@ -1,7 +1,7 @@
 TARGET=pastaos
-OBJS=boot.o main.o
+OBJS=boot.o console.o sched.o main.o
 
-CFLAGS=-m32 -Os -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -fno-pie
+CFLAGS=-m32 -Os -g -Wall -Wextra -fno-builtin -fomit-frame-pointer -fno-stack-protector -fno-pie -I.
 
 %.o: %.S
 	$(CC) -c -m32 $< -o $@

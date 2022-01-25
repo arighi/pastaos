@@ -1,0 +1,32 @@
+#ifndef CONSOLE_H
+#define CONSOLE_H
+
+#define CONSOLE_ADDRESS 0xb8000
+#define CONSOLE_PORT	0x03d4
+#define CONSOLE_WIDTH	80
+#define CONSOLE_HEIGHT	25
+
+enum color {
+	BLACK,
+	BLUE,
+	GREEN,
+	CYAN,
+	RED,
+	MAGENTA,
+	BROWN,
+	GREY,
+	DARK_GREY,
+	BRIGHT_BLUE,
+	BRIGHT_GREEN,
+	BRIGHT_CYAN,
+	BRIGHT_RED,
+	BRIGHT_MAGENTA,
+	YELLOW,
+	WHITE,
+
+	__COLOR_END__,
+};
+
+void printk(const char *str);
+
+#endif /* CONSOLE_H */
