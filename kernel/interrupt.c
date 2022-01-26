@@ -64,6 +64,7 @@ struct irq_desc {
 
 static void unhandled_interrupt(irq_context_t __attribute__ ((__unused__)) *c)
 {
+	BUG_ON(true);
 }
 
 static struct irq_desc irq_handler[IRQ_NR] __attribute__ ((__aligned__(16))) = {
@@ -75,7 +76,7 @@ static struct irq_desc irq_handler[IRQ_NR] __attribute__ ((__aligned__(16))) = {
 void default_exc_handler(exception_context_t *c)
 {
 	printk("exception: %d\n", c->exc);
-	panic();
+	BUG_ON(true);
 }
 
 /* Check if the IRQ occurred can be considered spurious or real */
