@@ -101,8 +101,8 @@ unsigned long long simple_strtoull(const char *cp, char **endp, unsigned int bas
  */
 long long simple_strtoll(const char *cp, char **endp, unsigned int base)
 {
-	if (*cp=='-')
-		return -simple_strtoull(cp+1, endp, base);
+	if (*cp == '-')
+		return -simple_strtoull(cp + 1, endp, base);
 	return simple_strtoull(cp, endp, base);
 }
 
@@ -123,9 +123,11 @@ static int skip_atoi(const char **s)
 #define SPECIAL	32		/* 0x */
 #define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
-static char *number(char * buf, char * end, long long num, int base, int size, int precision, int type)
+static char *
+number(char *buf, char *end,
+       long long num, int base, int size, int precision, int type)
 {
-	char c,sign,tmp[66];
+	char c, sign, tmp[66];
 	const char *digits;
 	const char small_digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 	const char large_digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -178,11 +180,11 @@ static char *number(char * buf, char * end, long long num, int base, int size, i
 		++buf;
 	}
 	if (type & SPECIAL) {
-		if (base==8) {
+		if (base == 8) {
 			if (buf <= end)
 				*buf = '0';
 			++buf;
-		} else if (base==16) {
+		} else if (base == 16) {
 			if (buf <= end)
 				*buf = '0';
 			++buf;
@@ -323,7 +325,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 						++str;
 					}
 				}
-				c = (unsigned char) va_arg(args, int);
+				c = (unsigned char)va_arg(args, int);
 				if (str <= end)
 					*str = c;
 				++str;
@@ -362,11 +364,11 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 
 			case 'p':
 				if (field_width == -1) {
-					field_width = 2*sizeof(void *);
+					field_width = 2 * sizeof(void *);
 					flags |= ZEROPAD;
 				}
 				str = number(str, end,
-						(unsigned long) va_arg(args, void *),
+						(unsigned long)va_arg(args, void *),
 						16, field_width, precision, flags);
 				continue;
 
@@ -461,14 +463,15 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
  * @fmt: The format string to use
  * @...: Arguments for the format string
  */
-int snprintf(char * buf, size_t size, const char *fmt, ...)
+int snprintf(char *buf, size_t size, const char *fmt, ...)
 {
 	va_list args;
 	int i;
 
 	va_start(args, fmt);
-	i=vsnprintf(buf,size,fmt,args);
+	i = vsnprintf(buf, size, fmt, args);
 	va_end(args);
+
 	return i;
 }
 
@@ -493,14 +496,15 @@ int vsprintf(char *buf, const char *fmt, va_list args)
  * @fmt: The format string to use
  * @...: Arguments for the format string
  */
-int sprintf(char * buf, const char *fmt, ...)
+int sprintf(char *buf, const char *fmt, ...)
 {
 	va_list args;
 	int i;
 
 	va_start(args, fmt);
-	i=vsprintf(buf,fmt,args);
+	i = vsprintf(buf, fmt, args);
 	va_end(args);
+
 	return i;
 }
 
@@ -510,7 +514,7 @@ int sprintf(char * buf, const char *fmt, ...)
  * @fmt:	format of buffer
  * @args:	arguments
  */
-int vsscanf(const char * buf, const char * fmt, va_list args)
+int vsscanf(const char *buf, const char *fmt, va_list args)
 {
 	const char *str = buf;
 	char *next;
@@ -520,7 +524,7 @@ int vsscanf(const char * buf, const char * fmt, va_list args)
 	int field_width = -1;
 	int is_sign = 0;
 
-	while(*fmt && *str) {
+	while (*fmt && *str) {
 		/* skip any white space in format */
 		/* white space in format matchs any amount of
 		 * white space, including none, in the input.
@@ -573,19 +577,19 @@ int vsscanf(const char * buf, const char * fmt, va_list args)
 		switch(*fmt++) {
 		case 'c':
 		{
-			char *s = (char *) va_arg(args,char*);
+			char *s = (char *)va_arg(args,char*);
 			if (field_width == -1)
 				field_width = 1;
 			do {
 				*s++ = *str++;
-			} while(field_width-- > 0 && *str);
+			} while (field_width-- > 0 && *str);
 			num++;
 		}
 		continue;
 		case 's':
 		{
-			char *s = (char *) va_arg(args, char *);
-			if(field_width == -1)
+			char *s = (char *)va_arg(args, char *);
+			if (field_width == -1)
 				field_width = INT_MAX;
 			/* first, skip leading white space in buffer */
 			while (isspace(*str))
@@ -641,43 +645,43 @@ int vsscanf(const char * buf, const char * fmt, va_list args)
 		case 'h':
 			if (is_sign) {
 				short *s = (short *) va_arg(args,short *);
-				*s = (short) simple_strtol(str,&next,base);
+				*s = (short)simple_strtol(str,&next,base);
 			} else {
-				unsigned short *s = (unsigned short *) va_arg(args, unsigned short *);
-				*s = (unsigned short) simple_strtoul(str, &next, base);
+				unsigned short *s = (unsigned short *)va_arg(args, unsigned short *);
+				*s = (unsigned short)simple_strtoul(str, &next, base);
 			}
 			break;
 		case 'l':
 			if (is_sign) {
 				long *l = (long *) va_arg(args,long *);
-				*l = simple_strtol(str,&next,base);
+				*l = simple_strtol(str, &next, base);
 			} else {
-				unsigned long *l = (unsigned long*) va_arg(args,unsigned long*);
-				*l = simple_strtoul(str,&next,base);
+				unsigned long *l = (unsigned long*)va_arg(args,unsigned long*);
+				*l = simple_strtoul(str, &next, base);
 			}
 			break;
 		case 'L':
 			if (is_sign) {
-				long long *l = (long long*) va_arg(args,long long *);
-				*l = simple_strtoll(str,&next,base);
+				long long *l = (long long*)va_arg(args,long long *);
+				*l = simple_strtoll(str, &next, base);
 			} else {
-				unsigned long long *l = (unsigned long long*) va_arg(args,unsigned long long*);
-				*l = simple_strtoull(str,&next,base);
+				unsigned long long *l = (unsigned long long*)va_arg(args,unsigned long long*);
+				*l = simple_strtoull(str, &next, base);
 			}
 			break;
 		case 'Z':
 		{
-			size_t *s = (size_t*) va_arg(args,size_t*);
-			*s = (size_t) simple_strtoul(str,&next,base);
+			size_t *s = (size_t*)va_arg(args,size_t*);
+			*s = (size_t) simple_strtoul(str, &next, base);
 		}
 		break;
 		default:
 			if (is_sign) {
-				int *i = (int *) va_arg(args, int*);
-				*i = (int) simple_strtol(str,&next,base);
+				int *i = (int *)va_arg(args, int*);
+				*i = (int) simple_strtol(str, &next, base);
 			} else {
-				unsigned int *i = (unsigned int*) va_arg(args, unsigned int*);
-				*i = (unsigned int) simple_strtoul(str,&next,base);
+				unsigned int *i = (unsigned int*)va_arg(args, unsigned int*);
+				*i = (unsigned int) simple_strtoul(str, &next, base);
 			}
 			break;
 		}
@@ -696,13 +700,14 @@ int vsscanf(const char * buf, const char * fmt, va_list args)
  * @fmt:	formatting of buffer
  * @...:	resulting arguments
  */
-int sscanf(const char * buf, const char * fmt, ...)
+int sscanf(const char *buf, const char *fmt, ...)
 {
 	va_list args;
 	int i;
 
 	va_start(args,fmt);
-	i = vsscanf(buf,fmt,args);
+	i = vsscanf(buf, fmt, args);
 	va_end(args);
+
 	return i;
 }
