@@ -4,26 +4,46 @@
 #include <interrupt.h>
 #include <panic.h>
 
-static int task1(void)
+#define TASK(__n, __worker)				\
+	static int __task ## __n(void)			\
+	{						\
+		while (true)				\
+			__worker(__n);			\
+		return 0;				\
+	}						\
+	static DECLARE_TASK(task ## __n, __task ## __n)	\
+
+static void worker(int pid)
 {
-	while (true) {
-		printk("%s\n", "hello from task1");
-		cpu_halt();
-		schedule();
-	}
-	return 0;
+	printk("hello from pid %d\n", pid);
+	cpu_halt();
+	schedule();
 }
 
-static DECLARE_TASK(t1, task1);
+TASK(1, worker);
+TASK(2, worker);
+TASK(3, worker);
+TASK(4, worker);
+TASK(5, worker);
+TASK(6, worker);
+TASK(7, worker);
+TASK(8, worker);
+TASK(9, worker);
 
 int main(void)
 {
-	task_run(&t1);
+	task_run(&task1);
+	task_run(&task2);
+	task_run(&task3);
+	task_run(&task4);
+	task_run(&task5);
+	task_run(&task6);
+	task_run(&task7);
+	task_run(&task8);
+	task_run(&task9);
 
-	while (true) {
-		printk("%s\n", "hello from init");
-		cpu_halt();
-		schedule();
-	}
+	while (true)
+		worker(0);
+
 	return 0;
 }
