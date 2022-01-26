@@ -3,6 +3,11 @@
 
 #define NULL		((void *)0)
 
+enum {
+	false	= 0,
+	true	= 1
+};
+
 typedef char int8_t;
 typedef unsigned char uint8_t;
 

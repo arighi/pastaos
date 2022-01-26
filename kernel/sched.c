@@ -50,8 +50,9 @@ void schedule(void)
 	 */
 	prev = current;
 	next = list_first_entry_or_null(&task_list, struct task_struct, next);
-	if (!next || next == prev)
+	if (!next)
 		return;
+	BUG_ON(next == prev);
 
 	/* Update current task state */
 	switch (prev->state) {
@@ -61,19 +62,32 @@ void schedule(void)
 		break;
 	case TASK_ZOMBIE:
 		break;
+	case TASK_SLEEPING:
+		BUG_ON(true);
+		break;
 	default:
-		panic();
+		printk("Invalid task state: %d\n", prev->state);
+		BUG_ON(true);
+		break;
 	}
 
 	/* Update next task state */
 	switch (next->state) {
+	case TASK_RUNNING:
+		BUG_ON(true);
+		break;
 	case TASK_SLEEPING:
 		next->state = TASK_RUNNING;
 		list_del_init(&next->next);
 		current = next;
 		break;
+	case TASK_ZOMBIE:
+		BUG_ON(true);
+		break;
 	default:
-		panic();
+		printk("Invalid task state: %d\n", next->state);
+		BUG_ON(true);
+		break;
 	}
 
 	/* Switch to the next task */
