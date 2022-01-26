@@ -3,7 +3,7 @@
 #include <console.h>
 
 /* Kernel is dead */
-void panic(void)
+void __noreturn panic(void)
 {
 	printk(">>> Kernel panic. Have a nice day. <<<\n");
 	irq_disable();

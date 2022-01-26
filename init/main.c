@@ -5,11 +5,10 @@
 #include <panic.h>
 
 #define TASK(__n, __worker)				\
-	static int __task ## __n(void)			\
+	static int __noreturn __task ## __n(void)	\
 	{						\
 		while (true)				\
 			__worker(__n);			\
-		return 0;				\
 	}						\
 	static DECLARE_TASK(task ## __n, __task ## __n)	\
 

@@ -9,6 +9,9 @@
 #define likely(x)	__builtin_expect(!!(x), 1)
 #define unlikely(x)	__builtin_expect(!!(x), 0)
 
+/* Function that never returns */
+#define __noreturn	__attribute__((__noreturn__))
+
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
 

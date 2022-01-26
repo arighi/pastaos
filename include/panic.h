@@ -3,7 +3,7 @@
 
 #include <console.h>
 
-void panic(void);
+void __noreturn panic(void);
 
 /* Trigger a kernel bug */
 static inline void __kernel_bug(const char *cond, const char *file, int line)
