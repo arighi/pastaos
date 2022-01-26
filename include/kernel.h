@@ -5,6 +5,10 @@
 #include <types.h>
 #include <compiler.h>
 
+/* Branch hints */
+#define likely(x)	__builtin_expect(!!(x), 1)
+#define unlikely(x)	__builtin_expect(!!(x), 0)
+
 /* Amount of items in array */
 #define ARRAY_SIZE(x)	(sizeof(x) / sizeof(*(x)))
 
@@ -14,7 +18,6 @@
 /* Get the object that contains a specific member */
 #define container_of(__ptr, __type, __member) \
 	((__type *)(void *)((char *)(__ptr) - offsetof(__type, __member)))
-
 
 /*
  * Memory barrier
