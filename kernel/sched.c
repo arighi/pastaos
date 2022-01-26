@@ -129,7 +129,7 @@ static void task_init(struct task_struct *task,
 	task->entry = entry;
 
 	/* Initialize task stack */
-	task->sp = &stack[size];
+	task->sp = &stack[size / sizeof(stack[0])];
 	stack_init(task);
 
 	/* Add task to the task list as sleeping */
