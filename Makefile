@@ -26,7 +26,7 @@ endif
 
 $(TARGET): $(OBJS)
 	@echo LD  $@
-	$(Q)$(LD) -m elf_i386 -T linker.ld $(OBJS) -o $(TARGET) -nostdlib
+	$(Q)$(LD) -m elf_i386 -T linker.ld $(OBJS) -o $(TARGET) -nostdlib -z noexecstack
 
 # Makefile targets
 all: $(TARGET)
